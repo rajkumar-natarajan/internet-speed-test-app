@@ -120,6 +120,28 @@ Before you begin, ensure you have the following installed:
    - Clean build in Xcode: Product -> Clean Build Folder
    - Delete derived data: Xcode -> Preferences -> Locations -> Derived Data -> Delete
 
+3. **Sandbox Permission Issues**
+   If you encounter rsync or permission errors during build, run these commands:
+   ```bash
+   # Reset Xcode command line tools
+   sudo xcode-select --reset
+
+   # Clean and reinstall pods
+   cd ios
+   rm -rf build/ DerivedData/ Pods/ Podfile.lock
+   cd ~/Library/Developer/Xcode
+   rm -rf DerivedData/InternetSpeedTestApp-*
+   cd - && pod install --repo-update
+
+   # Fix build directory permissions
+   sudo chown -R $(whoami) build
+   sudo chmod -R 755 build
+
+   # Fix Xcode DerivedData permissions
+   sudo chown -R $(whoami) ~/Library/Developer/Xcode/DerivedData
+   sudo chmod -R 755 ~/Library/Developer/Xcode/DerivedData
+   ```
+
 ### Android Issues
 
 1. **SDK Location Issues**
