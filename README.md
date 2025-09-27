@@ -104,34 +104,74 @@ Before you begin, ensure you have the following installed:
    npm run lint
    ```
 
-## Troubleshooting
+## Troubleshooting Guide
 
-### iOS Issues
+### Environment Setup Issues
 
-1. **Pod Install Issues**
+1. **Node.js Version Issues**
    ```bash
+   # Check Node version
+   node -v   # Should be 20 or higher
+
+   # If needed, install/update Node using nvm
+   nvm install 20
+   nvm use 20
+   ```
+
+2. **Java Version Issues**
+   ```bash
+   # Check Java version
+   java -version   # Should be 17
+
+   # Install Java 17 if needed
+   brew install openjdk@17
+
+   # Configure Java 17
+   sudo ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
+   echo 'export PATH="/usr/local/opt/openjdk@17/bin:$PATH"' >> ~/.zshrc
+   source ~/.zshrc
+   ```
+
+### iOS Development Issues
+
+1. **CocoaPods Installation Issues**
+   ```bash
+   # Install/Update CocoaPods
+   sudo gem install cocoapods
+
+   # If you get permissions errors
+   sudo gem uninstall cocoapods
+   brew install cocoapods
+   ```
+
+2. **Pod Install Issues**
+   ```bash
+   # Complete pod reset
    cd ios
    pod deintegrate
    pod cache clean --all
-   pod install
+   rm -rf Pods/
+   rm -rf ~/Library/Caches/CocoaPods
+   rm Podfile.lock
+   pod setup
+   pod install --repo-update
    ```
 
-2. **Build Issues**
-   - Clean build in Xcode: Product -> Clean Build Folder
-   - Delete derived data: Xcode -> Preferences -> Locations -> Derived Data -> Delete
-
-3. **Sandbox Permission Issues**
-   If you encounter rsync or permission errors during build, run these commands:
+3. **Build & Sandbox Permission Issues**
+   If you encounter rsync errors or permission issues during build:
    ```bash
    # Reset Xcode command line tools
    sudo xcode-select --reset
 
-   # Clean and reinstall pods
+   # Clean all build artifacts
    cd ios
    rm -rf build/ DerivedData/ Pods/ Podfile.lock
    cd ~/Library/Developer/Xcode
    rm -rf DerivedData/InternetSpeedTestApp-*
-   cd - && pod install --repo-update
+
+   # Reinstall pods
+   cd <project>/ios
+   pod install --repo-update
 
    # Fix build directory permissions
    sudo chown -R $(whoami) build
@@ -142,17 +182,124 @@ Before you begin, ensure you have the following installed:
    sudo chmod -R 755 ~/Library/Developer/Xcode/DerivedData
    ```
 
-### Android Issues
+4. **Metro Bundler Issues**
+   ```bash
+   # If Metro is already running on port 8081
+   lsof -i :8081 | grep LISTEN | awk '{print $2}' | xargs kill -9
+
+   # Clear Metro cache
+   rm -rf ~/Library/Developer/Xcode/DerivedData/*
+   rm -rf $TMPDIR/metro-*
+   rm -rf $TMPDIR/haste-map-*
+   ```
+
+5. **Xcode Build Issues**
+   - Clean build: Product -> Clean Build Folder (Shift + Cmd + K)
+   - Reset package caches: File -> Packages -> Reset Package Caches
+   - Delete derived data: Xcode -> Preferences -> Locations -> Derived Data -> Delete
+   - If issues persist:
+     ```bash
+     # Clean Xcode caches
+     rm -rf ~/Library/Developer/Xcode/DerivedData
+     rm -rf ~/Library/Caches/com.apple.dt.Xcode
+     ```
+
+### Android Development Issues
 
 1. **SDK Location Issues**
-   - Verify `local.properties` exists in the android folder
-   - Ensure Android SDK is properly installed via Android Studio
+   ```bash
+   # Create/update local.properties
+   echo "sdk.dir=$HOME/Library/Android/sdk" > android/local.properties
+
+   # Verify Android SDK installation
+   ls $HOME/Library/Android/sdk
+   ```
 
 2. **Gradle Issues**
    ```bash
+   # Clean Gradle cache
    cd android
    ./gradlew clean
-   cd ..
+   rm -rf ~/.gradle/caches/
+   ./gradlew --refresh-dependencies
+   
+   # If Gradle wrapper issues
+   cd android
+   rm -rf gradle/wrapper
+   ./gradlew wrapper
+   ```
+
+3. **Android Build Tools Issues**
+   ```bash
+   # Using sdkmanager
+   $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "build-tools;33.0.0"
+   $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-33"
+   ```
+
+### TypeScript and React Native Issues
+
+1. **TypeScript Configuration Issues**
+   ```bash
+   # Reset TypeScript configuration
+   rm -rf tsconfig.json
+   cp node_modules/@react-native/typescript-config/tsconfig.json .
+   
+   # Add necessary compiler options
+   {
+     "extends": "@react-native/typescript-config",
+     "compilerOptions": {
+       "esModuleInterop": true,
+       "jsx": "react-jsx",
+       "skipLibCheck": true
+     }
+   }
+   ```
+
+2. **React Native CLI Issues**
+   ```bash
+   # Reset React Native CLI
+   npm uninstall -g react-native-cli
+   npm install -g @react-native-community/cli
+
+   # Clear npm cache if needed
+   npm cache clean --force
+   ```
+
+### General Debugging Tips
+
+1. **Clean Project**
+   ```bash
+   # Remove all build artifacts and dependencies
+   rm -rf node_modules/
+   rm -rf ios/Pods/
+   rm -rf android/build/
+   rm -rf android/app/build/
+   npm cache clean --force
+   
+   # Reinstall everything
+   npm install
+   cd ios && pod install && cd ..
+   ```
+
+2. **Reset Git Repository**
+   ```bash
+   # If you need to reset to a clean state (careful!)
+   git clean -fdx
+   git reset --hard
+   ```
+
+3. **Development Environment Health Check**
+   ```bash
+   # Check React Native environment
+   npx react-native doctor
+   
+   # Check iOS environment
+   xcodebuild -version
+   pod --version
+   
+   # Check Android environment
+   java -version
+   adb devices
    ```
 
 ## Project Structure
