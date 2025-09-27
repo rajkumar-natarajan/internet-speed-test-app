@@ -1,70 +1,161 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Internet Speed Test App
 
-# Getting Started
+A React Native application to test internet connection speed.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Prerequisites
 
-## Step 1: Start Metro
+Before you begin, ensure you have the following installed:
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- Node.js 20 or higher
+- Java Development Kit (JDK) 17
+  ```bash
+  brew install openjdk@17
+  ```
+- Xcode 15+ (for iOS development)
+- Android Studio (for Android development)
+- CocoaPods (for iOS dependencies)
+  ```bash
+  sudo gem install cocoapods
+  ```
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Environment Setup
 
-```sh
-# Using npm
-npm start
+1. **Configure Java 17**
+   ```bash
+   # Create symlink for Java 17
+   sudo ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
 
-# OR using Yarn
-yarn start
-```
+   # Add to your shell profile (.zshrc or .bash_profile)
+   echo 'export PATH="/usr/local/opt/openjdk@17/bin:$PATH"' >> ~/.zshrc
+   source ~/.zshrc
+   ```
 
-## Step 2: Build and run your app
+2. **Android Setup**
+   - Install Android Studio
+   - Install Android SDK (via Android Studio SDK Manager)
+   - Create a `local.properties` file in the `android` directory:
+     ```bash
+     echo "sdk.dir=$HOME/Library/Android/sdk" > android/local.properties
+     ```
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Project Setup
 
-### Android
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/rajkumar-natarajan/internet-speed-test-app.git
+   cd internet-speed-test-app
+   ```
 
-```sh
-# Using npm
-npm run android
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-# OR using Yarn
-yarn android
-```
+3. **iOS Setup**
+   ```bash
+   cd ios
+   pod install
+   cd ..
+   ```
+
+## Running the App
 
 ### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+1. **Using Xcode (Recommended)**
+   ```bash
+   npm run ios-xcode
+   ```
+   Then in Xcode:
+   - Select a simulator or device
+   - Click the Run button (▶️) or press Cmd + R
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+2. **Using Command Line**
+   ```bash
+   npm run ios
+   ```
 
-```sh
-bundle install
+### Android
+
+1. **Start an Android Emulator** (via Android Studio)
+   - Open Android Studio
+   - Open Tools -> Device Manager
+   - Launch your preferred emulator
+
+2. **Run the app**
+   ```bash
+   npm run android
+   ```
+
+## Development
+
+1. **Start Metro Bundler**
+   ```bash
+   npm start
+   ```
+
+2. **Run Tests**
+   ```bash
+   npm test
+   ```
+
+3. **Lint Code**
+   ```bash
+   npm run lint
+   ```
+
+## Troubleshooting
+
+### iOS Issues
+
+1. **Pod Install Issues**
+   ```bash
+   cd ios
+   pod deintegrate
+   pod cache clean --all
+   pod install
+   ```
+
+2. **Build Issues**
+   - Clean build in Xcode: Product -> Clean Build Folder
+   - Delete derived data: Xcode -> Preferences -> Locations -> Derived Data -> Delete
+
+### Android Issues
+
+1. **SDK Location Issues**
+   - Verify `local.properties` exists in the android folder
+   - Ensure Android SDK is properly installed via Android Studio
+
+2. **Gradle Issues**
+   ```bash
+   cd android
+   ./gradlew clean
+   cd ..
+   ```
+
+## Project Structure
+
+```
+internet-speed-test-app/
+├── __tests__/          # Test files
+├── android/            # Android native code
+├── ios/               # iOS native code
+├── src/               # Source files
+│   ├── components/    # React components
+│   ├── screens/       # Screen components
+│   └── utils/         # Utility functions
+└── App.tsx           # Root component
 ```
 
-Then, and every time you update your native dependencies, run:
+## Contributing
 
-```sh
-bundle exec pod install
-```
+1. Create a new branch
+2. Make your changes
+3. Submit a pull request
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## License
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
+This project is licensed under the MIT License - see the LICENSE file for details
 
 Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
 
