@@ -23,15 +23,16 @@ namespace facebook {
 namespace yoga {
 namespace numeric {
 
+// General template declaration
 template <typename T>
 bool isUndefined(T value);
 
-// Explicit template specialization declarations
+// Forward declare specialization for float inside namespace
 template <>
 bool isUndefined(float value);
 
-template <>
-bool isUndefined(YGValue value);
+// Note: The specialization for YGValue is forward declared in YGValue.h
+// and defined in YGValue.cpp outside the namespace
 
 template <typename T>
 inline bool equal(T a, T b) {
@@ -117,28 +118,26 @@ const YGValue YGValueUndefined = {YGUndefined, YGUnitUndefined};
 const YGValue YGValueAuto = {YGUndefined, YGUnitAuto};
 const YGValue YGValueZero = {0, YGUnitPoint};
 
-// Need to make YGValue visible in the facebook::yoga::numeric namespace
 namespace facebook {
 namespace yoga {
 namespace numeric {
 
-// Use the struct definition from the global scope
-using ::YGValue;
-
-// Template specializations
+// Template specialization for float
 template <>
 bool isUndefined(float value) {
   return std::isnan(value);
 }
 
-template <>
-bool isUndefined(YGValue value) {
-  return value.unit == YGUnitUndefined;
-}
-
 } // namespace numeric
 } // namespace yoga
 } // namespace facebook
+
+// Define specialization outside of namespace to avoid ambiguity
+// This needs to be in the global namespace where YGValue is defined
+template <>
+bool facebook::yoga::numeric::isUndefined(YGValue value) {
+  return value.unit == YGUnitUndefined;
+}
 EOF
 
 # Backup the original file and replace it with the fixed version
