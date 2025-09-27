@@ -112,15 +112,20 @@ cat << 'EOF' > node_modules/react-native/ReactCommon/yoga/yoga/YGValue.cpp.fixed
 #include <yoga/numeric/Comparison.h>
 #include <cmath>
 
-// YGValue constants
+// YGValue constants - defined outside of any namespace
 const YGValue YGValueUndefined = {YGUndefined, YGUnitUndefined};
 const YGValue YGValueAuto = {YGUndefined, YGUnitAuto};
 const YGValue YGValueZero = {0, YGUnitPoint};
 
+// Need to make YGValue visible in the facebook::yoga::numeric namespace
 namespace facebook {
 namespace yoga {
 namespace numeric {
 
+// Use the struct definition from the global scope
+using ::YGValue;
+
+// Template specializations
 template <>
 bool isUndefined(float value) {
   return std::isnan(value);
