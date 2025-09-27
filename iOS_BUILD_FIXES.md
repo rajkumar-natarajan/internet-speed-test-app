@@ -48,7 +48,17 @@ This document summarizes all the fixes applied to resolve iOS build issues in th
 - Ensured the full struct definition was available before using it in template specializations
 - Updated the namespace implementation to correctly reference the global YGValue type
 
-### 6. Automated Fix Script
+### 6. Ambiguous Reference to YGValue
+
+**Problem**: Compilation error due to ambiguous reference to YGValue in template specializations.
+
+**Solution**:
+- Moved the `isUndefined` template specialization for YGValue outside of the facebook::yoga::numeric namespace
+- Forward declared YGValue before the namespace in YGValue.h
+- Explicitly referenced the global YGValue type in the forward declaration
+- Updated the Comparison.cpp file to note that YGValue specialization is defined elsewhere
+
+### 7. Automated Fix Script
 
 Created a comprehensive `fix_headers.sh` script that:
 - Creates missing directory structures
