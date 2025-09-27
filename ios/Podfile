@@ -35,6 +35,9 @@ target 'InternetSpeedTestApp' do
     # Comprehensive fixes for React-related build issues
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
+        # Force C++20 for all targets to ensure compatibility with latest Yoga code
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+        
         # Allow non-modular includes in framework modules
         config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
         
@@ -44,6 +47,7 @@ target 'InternetSpeedTestApp' do
         config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Public/React-Core"'
         config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Public/React"'
         config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Public/yoga"'
+        config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Public/Yoga"'
         config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/../.."'
         
         # This is needed for M1 Macs
@@ -74,8 +78,18 @@ target 'InternetSpeedTestApp' do
           config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_TARGET_SRCROOT}/ReactCommon/yoga/yoga"'
           config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_TARGET_SRCROOT}/ReactCommon/yoga"'
           
-          # Force C++17 for Yoga which is more compatible
+          # Set C++17 for Yoga to avoid namespace issues
           config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+          
+          # Disable warnings that are treated as errors for Yoga
+          config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+          config.build_settings['SWIFT_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+          config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
+          config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
+          
+          # Additional fixes for Yoga compilation
+          config.build_settings['CLANG_WARN_UNREACHABLE_CODE'] = 'NO'
+          config.build_settings['CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS'] = 'NO'
         end
       end
     end
