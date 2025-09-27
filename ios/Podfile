@@ -31,5 +31,53 @@ target 'InternetSpeedTestApp' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    
+    # Comprehensive fixes for React-related build issues
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        # Allow non-modular includes in framework modules
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        
+        # Add complete header search paths for React
+        config.build_settings['HEADER_SEARCH_PATHS'] ||= '$(inherited)'
+        config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Public"'
+        config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Public/React-Core"'
+        config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Public/React"'
+        config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Public/yoga"'
+        config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/../.."'
+        
+        # This is needed for M1 Macs
+        config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+        
+        # Force enable modules for all targets
+        config.build_settings['DEFINES_MODULE'] = 'YES'
+        
+        # Ensure all deployment targets match
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+        
+        # Add USER_HEADER_SEARCH_PATHS
+        config.build_settings['USER_HEADER_SEARCH_PATHS'] ||= '$(inherited)'
+        config.build_settings['USER_HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Private"'
+        config.build_settings['USER_HEADER_SEARCH_PATHS'] << ' "${PODS_ROOT}/Headers/Private/React-Core"'
+        
+        # Set proper permissions for frameworks
+        if target.name == "hermes-engine" || target.name.include?("React")
+          config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        end
+      end
+      
+      # Fix Yoga-specific issues
+      if target.name == 'Yoga'
+        target.build_configurations.each do |config|
+          # Add specific header search path for Yoga
+          config.build_settings['HEADER_SEARCH_PATHS'] ||= '$(inherited)'
+          config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_TARGET_SRCROOT}/ReactCommon/yoga/yoga"'
+          config.build_settings['HEADER_SEARCH_PATHS'] << ' "${PODS_TARGET_SRCROOT}/ReactCommon/yoga"'
+          
+          # Force C++17 for Yoga which is more compatible
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
+      end
+    end
   end
 end
