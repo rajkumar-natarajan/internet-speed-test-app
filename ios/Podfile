@@ -24,7 +24,7 @@ target 'InternetSpeedTestApp' do
     :path => config[:reactNativePath],
     # An absolute path to your application root.
   :app_path => "#{Pod::Config.instance.installation_root}/..",
-  # Disable Hermes to avoid copying hermes.framework when macOS sandbox denies rsync access
+  # Disable Hermes completely to avoid XCFramework embedding issues
   :hermes_enabled => false
   )
 
