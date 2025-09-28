@@ -9,7 +9,7 @@ platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
 # Force Hermes disabled at pod install time to avoid macOS sandbox rsync embed failures
-ENV['USE_HERMES'] = 'false'
+# Note: USE_HERMES=0 is not supported in RN 0.81+, using :hermes_enabled => false instead
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
